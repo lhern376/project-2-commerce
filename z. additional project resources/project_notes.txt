@@ -1,8 +1,15 @@
 >>  superuser:
 
-    lhern376
-    college email
-    college email password
+    lhern
+    lhern@fake.com
+    pass: commerce.wf but more intricate
+
+
+>>  other users:
+
+    johndoe1    password.123
+    johndoe2    password.123
+    johndoe3    password.123
 
 
 >>  images

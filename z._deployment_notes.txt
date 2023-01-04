@@ -1,0 +1,107 @@
+
+-------------------------------------------------------------------------------------------------------
+----    Move system/settings information to config file /etc/conf_my_projects/project_2_commerce.json
+
+        - secret key for the app
+
+        - and for future apps:
+            - email username and password
+            - database username and password
+
+        - in /etc/conf_my_projects/project_2_commerce.json:
+
+{
+    "SECRET_KEY": "6ps8j!crjgrxt34cqbqn7x&b3y%(fny8k8nh21+qa)%ws3fh!q"
+}
+
+
+-------------------------------------------------------------------------------------------------------
+----    Things to tweak on the project files
+
+
+>>      settings.py
+
+import json
+
+with open("/etc/conf_my_projects/project_2_commerce.json") as config_file:
+    config = json.load(config_file)
+
+SECRET_KEY = config["SECRET_KEY"]
+
+DEBUG = False
+
+ALLOWED_HOSTS = ["34.171.109.67"]
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = '/static/'
+
+
+-------------------------------------------------------------------------------------------------------
+----    Things to run after tweaking the project files
+
+
+>>      static files
+
+        (env) $ python manage.py collectstatic      --> after running, it will show where it put the static files.
+                                                    --> add the path to the apache vhost config (see below)
+
+
+>>      permissions for the project
+
+        - first add group ownership of ENTIRE project to apache and give it write permissions
+
+            chown :www-data commerce
+
+            chmod 775 commerce
+
+        - add group ownership to database (db.sqlite3) and change its permissions
+
+            chown :www-data commerce/db.sqlite3
+
+            chmod 664 commerce/db.sqlite3
+
+        - add group ownership to 'media' dir recursively and change its permissions
+
+            chown -R :www-data commerce/media/
+
+            chmod -R 775 commerce/media/
+
+
+
+
+-------------------------------------------------------------------------------------------------------
+----    Apache's vHost config file
+
+
+        - project-2-commerce.conf
+
+Listen 8084
+<VirtualHost *:8084>
+
+        WSGIDaemonProcess commerce python-home=/var/www/projects/project-2-commerce/env python-path=/var/www/projects/project-2-commerce/commerce user=www-data group=www-data threads=5
+        WSGIScriptAlias / /var/www/projects/project-2-commerce/commerce/commerce/wsgi.py
+        WSGIProcessGroup commerce
+        WSGIApplicationGroup %{GLOBAL}
+
+        <Directory /var/www/projects/project-2-commerce/commerce/commerce>
+                <Files wsgi.py>
+                        Require all granted
+                </Files>
+        </Directory>
+
+        Alias /static /var/www/projects/project-2-commerce/commerce/staticfiles
+        <Directory /var/www/projects/project-2-commerce/commerce/staticfiles>
+                Require all granted
+        </Directory>
+
+        Alias /media /var/www/projects/project-2-commerce/commerce/media
+        <Directory /var/www/projects/project-2-commerce/commerce/media>
+                Require all granted
+        </Directory>
+
+        ErrorLog /var/www/projects/project-2-commerce/error.log
+        CustomLog /var/www/projects/project-2-commerce/access.log combined
+</VirtualHost>
