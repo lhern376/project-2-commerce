@@ -7,7 +7,7 @@
 
 >>  other users:
 
-    johndoe1    password.123
+    johndoe1    password.123    johndoe1@email.com
     johndoe2    password.123
     johndoe3    password.123
 
