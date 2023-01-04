@@ -1,0 +1,53 @@
+{% extends "auctions/listings_by_category.html" %}
+{% load static %}
+
+
+{% block listing_heading %}
+    Watching
+{% endblock %}
+
+
+{% block customButton %}
+<!-- All the same as 'category listings' and 'all listings' except for this block -->
+
+<span class="btn btn-sm text-danger rounded-pill fs-5 position-absolute bottom-0 start-100 watchlist-btn js-btn" 
+    data-js-id="{{listing.id}}" title="remove">
+    <div><i class="bi bi-x-lg"></i></div>
+</span>
+
+<!-- ---------------------------------------------------------------------------- -->
+{% endblock %}
+
+
+{% block listing_status %}
+    {% if listing.status == 'closed' %}
+        <span class="badge text-bg-danger">Closed</span>
+    {% else %}
+        {% if listing.was_edited %}
+        <span class="badge text-bg-warning">Edited: {{ listing.edit_count }}</span>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+
+{% block listings_owned_custom %}
+Set to start:
+{% endblock %}
+
+
+{% block customMessage %}
+<div>
+    {% if search_criteria %} 
+        No results found. 
+    {% else %} 
+        No listings added. 
+    {% endif %}
+</div>
+{% endblock %}
+
+
+{% block additional_js_inherits_listings %}
+    <script src="{% static 'auctions/watchlist.js' %}"></script>
+{% endblock %}
+
+

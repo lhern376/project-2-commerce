@@ -1,0 +1,64 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block body %}
+<div class="wrapper-form mx-auto mt-5 border p-4 rounded shadow-sm">
+    <h2 class="{{ focus }}">Register</h2>
+    <hr>
+    <div class="py-3"></div>
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-warning d-flex align-items-center border-0 border-start border-5 border-warning" role="alert">
+            <i class="bi flex-shrink-0 me-2 bi-exclamation-diamond"></i>
+            <div>{{ form.non_field_errors }}</div>
+        </div>
+    {% endif %}
+
+    {% if message %}
+        <div class="alert alert-danger d-flex align-items-center border-0 border-start border-5 border-danger" role="alert">
+            <i class="bi flex-shrink-0 me-2 bi-exclamation-diamond"></i>
+            <div>{{ message }}</div>
+        </div>
+    {% endif %}
+
+    <form action="{% url 'register' %}" method="post" class="fs-6">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <div class="text-danger css-list-unstyled">{{ form.username.errors }}</div>
+            <input class="form-control {% if form.username.errors %} border-danger {% endif %}" {% if on_get %} autofocus {% endif %} type="text" name="username" placeholder="Username" 
+            value="{% if username %}{{ username }}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <div class="text-danger css-list-unstyled">{{ form.email.errors }}</div>
+            <input class="form-control {% if form.email.errors %} border-danger {% endif %}" type="email" name="email" placeholder="Email Address"
+            value="{% if email %}{{ email }}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <div class="text-danger css-list-unstyled">{{ form.password.errors }}</div>
+            <input class="form-control {% if form.password.errors %} border-danger {% endif %}" type="password" name="password" placeholder="Password"
+            value="{% if password %}{{ password }}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <div class="text-danger css-list-unstyled">{{ form.confirmation.errors }}</div>
+            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password"
+            value="{% if confirmation %}{{ confirmation }}{% endif %}" required>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+            <input class="btn btn-primary w-50" type="submit" value="Register">
+        </div>
+        
+    </form>
+
+    <div class="mt-5">
+        Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+    </div>
+    
+</div>
+
+{% endblock %}
+
+{% block additional_js %}
+    <script src="{% static 'auctions/register.js' %}"></script>  
+{% endblock %}
+

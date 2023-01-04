@@ -1,0 +1,53 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="wrapper-form mx-auto mt-5 border p-4 rounded shadow-sm">
+    <h2>Login</h2>
+    <hr>
+    <div class="py-3"></div>
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-warning d-flex align-items-center border-0 border-start border-5 border-warning" role="alert">
+            <i class="bi flex-shrink-0 me-2 bi-exclamation-diamond"></i>
+            <div>{{ form.non_field_errors }}</div>
+        </div>
+    {% endif %}
+
+    {% if message %}
+        <div class="alert alert-danger d-flex align-items-center border-0 border-start border-5 border-danger" role="alert">
+            <i class="bi flex-shrink-0 me-2 bi-exclamation-diamond"></i>
+            <div>{{ message }}</div>
+        </div>
+    {% endif %}
+
+
+    {% if next %}
+    <form action="{% url 'login' %}?next={{ next }}" method="post" class="fs-6">
+    {% else %}
+    <form action="{% url 'login' %}" method="post" class="fs-6">
+    {% endif %}
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <div class="text-danger css-list-unstyled">{{ form.username.errors }}</div>
+            <input autofocus class="form-control" type="text" name="username" placeholder="Username"
+            value="{% if username %}{{ username }}{% endif %}" required>
+        </div>
+        <div class="form-group mb-3">
+            <div class="text-danger css-list-unstyled">{{ form.password.errors }}</div>
+            <input class="form-control" type="password" name="password" placeholder="Password"
+            value="{% if password %}{{ password }}{% endif %}" required>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+            <input class="btn btn-primary w-50" type="submit" value="Login">
+        </div>
+    </form>
+
+    <div class="mt-5">
+        Don't have an account? <a href="{% url 'register' %}">Register here.</a>
+    </div>
+    
+
+</div>
+
+{% endblock %}

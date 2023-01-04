@@ -1,0 +1,316 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+
+{% block body %}
+<div class="wrapper-content">
+
+<section>
+    <div class="css-wrapper-heading">
+        <h2>
+            <!-- block -->
+            {% block listing_heading %}
+                {{ category.category_name }}
+            {% endblock %}
+        </h2>
+        <div>
+            <div class="form-check form-switch css-switch">
+                <input class="form-check-input js-switch" type="checkbox" role="switch" id="switch">
+                <label class="form-check-label text-primary" for="switch"><i class="bi bi-grid"></i> Gallery</label>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <button type="button" class="btn btn-outline-primary d-lg-none mb-2 js-modal-button" data-bs-toggle="modal" data-bs-target="#modal">
+        <i class="bi bi-funnel"></i> Filter
+    </button>
+    <div class="modal fade js-modal-container" id="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5"><i class="bi bi-funnel"></i> Filters</h1>
+                <button type="button" class="btn-close js-close-modal-button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+                <article class="border border-1 rounded p-3 css-modal-content js-modal-parent">
+
+                    <!-- MOVE THE FORM element HERE WITH JS -->
+        
+                </article>
+            </div>
+        </div>
+        </div>
+    </div>
+    <!-- endModal -->
+    {% if search_criteria %}
+    <div class="text-secondary" style="--bs-text-opacity: .8">
+        <div>
+            <em style="font-size: .8rem;">{{results_count}} result{{results_count|pluralize}}</em>
+        </div>
+        <div class="wrapper-search-hint">
+            <span>Results by:</span><em class="">{{ search_criteria.criteria }}</em>
+        </div>
+        {% if search_criteria.max %}
+        <div class="wrapper-search-hint">
+            <span>Price range:</span><em class="">${{ search_criteria.min }} to ${{ search_criteria.max }}</em>
+        </div>
+        {% endif %}
+        {% if search_criteria.price_range_hint %}
+        <div class="wrapper-search-hint">
+            <span>Price range:</span><em class="">{{ search_criteria.price_range_hint }}</em>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    <!-- <hr> -->
+    <div class="py-3"></div>
+
+    <ul class="list-unstyled container-fluid border shadow rounded js-ul">
+    {% for listing in listings %}
+
+        <li class="position-relative border-bottom rounded-1 py-3 d-flex flex-sm-row align-items-sm-start flex-column align-items-center">
+
+            <div class="me-5 mb-3 flex-sm-shrink-0 position-relative wrapper-img">
+            <!-- block -->
+            {% block customButton %}
+                {% if user.is_authenticated %}
+                    {% if listing in user.get_watchlist %}
+                    <span class="btn btn-sm fs-5 rounded-5 position-absolute bottom-0 start-100 highlight-btn js-watchlist-btn" 
+                            title="remove from watchlist" data-js-action="remove" data-js-id="{{listing.id}}">
+                        <div><i class="bi bi-heart-fill"></i></div>
+                    </span>
+                    {% else %}
+                    <span class="btn btn-sm fs-5 rounded-5 position-absolute bottom-0 start-100 highlight-btn js-watchlist-btn" 
+                            title="add to watchlist" data-js-action="add" data-js-id="{{listing.id}}">
+                        <div><i class="bi bi-heart"></i></div>
+                    </span>
+                    {% endif %}
+                {% else %}
+                <span class="btn btn-sm fs-5 rounded-5 position-absolute bottom-0 start-100 highlight-btn" 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Log in to add to watchlist">
+                    <i class="bi bi-heart"></i>
+                </span>
+                {% endif %}
+            {% endblock %}
+                <a href="{% url 'listing-details' listing.pk %}" tabindex="-1"><img class="img-thumbnail bg-light" src="{{ listing.image.url }}" alt="Image for: {{ listing.title }}"></a>
+            </div>
+
+            
+
+            <div class="wrapper-description {% block listing_description_margin %} {% endblock %} ">
+                <p class="mb-4">
+                    <a class="d-block text-decoration-none link-dark fw-bold link-hover" href="{% url 'listing-details' listing.pk %}">{{ listing.title }}</a>
+                    <!-- listing status is only shown in watchlist and my-listings -->
+                    {% block listing_status %}
+                    {% endblock %}
+                </p>
+                <p>
+                    <div class="fs-6 fw-bold">${{ listing.current_price }}</div>
+                    <div class="text-secondary fs-6" style="--bs-text-opacity: .8">Bids: {{ listing.bid_count }}</div>
+                </p>
+                <p>
+                    <div class="text-secondary fs-6" style="--bs-text-opacity: .8">
+                    {% if listing.status == 'active' %}
+                        Ends:<br><span> 
+                        {% if listing.listing_ends == "No date set" %}
+                            {{ listing.listing_ends }}
+                        {% else %}
+                            {{ listing.listing_ends|date:"N d, Y - h:i A T" }}
+                        {% endif %}
+                        </span>
+                    {% else %}
+                        Ended:<br><span>
+                        {{ listing.bidding_ended|date:"N d, Y - h:i A T" }}
+                    {% endif %}
+                    </div>
+                    <!-- <div class="text-secondary fs-6" style="--bs-text-opacity: .8">{# listing.get_readable_date #}</div> -->
+                </p>
+                <p>
+                    <div class="text-secondary fs-6" style="--bs-text-opacity: .8">{% block listings_owned_custom %}Posted:{% endblock %}<br> {{ listing.bidding_starts|date:"N d, Y - h:i A T" }}</div>
+                </p>
+
+            </div>
+
+            {% block listing_edit %}{% endblock %}
+        </li>
+        
+    {% empty %}
+        <li class="text-secondary fs-5 p-5" style="--bs-text-opacity: .8">
+            <!-- block -->
+            {% block customMessage %}
+            <div>
+                {% if search_criteria %} 
+                    No results found. 
+                {% else %} 
+                    No active listings. 
+                {% endif %}
+            </div>
+            {% endblock %}
+        </li>
+    {% endfor%}
+    </ul>
+
+    <!-- standard, non elided pagination -->
+
+    {% comment %}
+    {% if is_paginated %}
+    <nav class="pt-4 mb-5 border shadow rounded">
+    <div class="d-flex justify-content-center">
+    <ul class="pagination flex-wrap">
+        <!-- three sections: previous, next, and the page numbers -->
+
+        {% if page_obj.has_previous %}
+        <li class="page-item mb-3"><a class="page-link js-link" href="?page={{ page_obj.previous_page_number }}&min={{min}}&max={{max}}&sort_by={{sort_by}}&is_gallery_active={{is_gallery_active}}"><i class="bi bi-chevron-left"></i> Prev</a></li>
+        {% else %}
+        <li class="page-item mb-3 disabled"><span class="page-link"><i class="bi bi-chevron-left"></i> Prev</span></li>
+        {% endif %}
+
+        {% for i in paginator.page_range %}
+        {% if page_obj.number == i %}
+            <li class="page-item mb-3 active"><span class="page-link">{{ i }}</li>
+        {% else %}
+            <li class="page-item mb-3"><a class="page-link js-link" href="?page={{ i }}&min={{min}}&max={{max}}&sort_by={{sort_by}}&is_gallery_active={{is_gallery_active}}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item mb-3"><a class="page-link js-link" href="?page={{ page_obj.next_page_number }}&min={{min}}&max={{max}}&sort_by={{sort_by}}&is_gallery_active={{is_gallery_active}}">Next <i class="bi bi-chevron-right"></i></a></li>
+        {% else %}
+        <li class="page-item mb-3 disabled"><span class="page-link">Next <i class="bi bi-chevron-right"></i></span></li>
+        {% endif %}
+
+    </ul>
+    </div>
+    </nav>
+    {% endif %}
+    {% endcomment %}
+
+    <!-- elided pagination -->
+
+    {% if is_paginated %}
+    <nav class="pt-4 px-3 mb-5 border shadow rounded">
+    <div class="d-flex justify-content-center">
+    <ul class="pagination flex-wrap">
+        <!-- three sections: previous, next, and the page numbers -->
+
+        {% if page_obj.has_previous %}
+        <li class="page-item mb-3"><a class="page-link js-link text-dark" href="?page={{ page_obj.previous_page_number }}&min={{min}}&max={{max}}&sort_by={{sort_by}}&is_gallery_active={{is_gallery_active}}"><i class="bi bi-chevron-left"></i> Prev</a></li>
+        {% else %}
+        <li class="page-item mb-3 disabled"><span class="page-link"><i class="bi bi-chevron-left"></i> Prev</span></li>
+        {% endif %}
+
+        {% for i in elided_page_range %}
+        {% if page_obj.number == i %}
+            <li class="page-item mb-3 active"><span class="page-link text-dark border-dark bg-white">{{ i }}</li>
+        {% elif paginator.ELLIPSIS == i %}
+            <li class="page-item mb-3 disabled"><span class="page-link opacity-75"><i class="bi bi-three-dots"></i></li>
+        {% else %}
+            <li class="page-item mb-3"><a class="page-link text-dark js-link" href="?page={{ i }}&min={{min}}&max={{max}}&sort_by={{sort_by}}&is_gallery_active={{is_gallery_active}}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item mb-3"><a class="page-link text-dark js-link" href="?page={{ page_obj.next_page_number }}&min={{min}}&max={{max}}&sort_by={{sort_by}}&is_gallery_active={{is_gallery_active}}">Next <i class="bi bi-chevron-right"></i></a></li>
+        {% else %}
+        <li class="page-item mb-3 disabled"><span class="page-link">Next <i class="bi bi-chevron-right"></i></span></li>
+        {% endif %}
+
+    </ul>
+    </div>
+    </nav>
+    {% endif %}
+
+
+</section>
+
+<aside class="position-relative">
+    <div class="ps-5 pt-3 position-sticky top-0">
+
+        <article class="border border-1 rounded p-3 shadow js-container-parent">
+            <h4 class="pb-3 border-bottom border-1"><i class="bi bi-funnel"></i> Filters</h4>
+
+            <form action="" method="get" class="js-form-child">
+
+                <!-- hidden input for tracking is_gallery_active after form submission -->
+                {% if is_gallery_active %}
+                    <input class="js-hidden" type="hidden" name="is_gallery_active" value="{{is_gallery_active}}">
+                {% else %}
+                    <input class="js-hidden" type="hidden" name="is_gallery_active" value="">
+                {% endif %}
+
+                <label class="fw-bold my-3" for="min">Price range</label>
+
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light">$</span>
+                        <input type="tel" name="min" id="min" placeholder="Min" pattern="^\d*\.?\d*$" onclick="this.value=''" class="form-control bg-light" {% if min %} value="{{min}}" {% endif %}>
+                    </div>
+                    <span class="mx-2">to</span>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light">$</span>
+                        <input type="tel" name="max" placeholder="Max" pattern="^\d*\.?\d*$" onclick="this.value=''" class="form-control bg-light" {% if max %} value="{{max}}" {% endif %}>
+                    </div>
+                </div>
+                <div class="text-end text-secondary text-sm opacity-75"><small>(Enter dollar amounts only)</small></div>
+
+                <label class="fw-bold mt-4 mb-2">Sort by</label>
+
+                <div class="ms-3">
+                    <div class="form-check">
+                        <input class="form-check-input opacity-75" type="radio" name="sort_by" id="newest" value="newest" required {% if sort_by == "newest" %} checked {% endif %}>
+                        <label class="form-check-label" for="newest">
+                            Latest
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input opacity-75" type="radio" name="sort_by" id="oldest" value="oldest" {% if sort_by == "oldest" %} checked {% endif %}>
+                        <label class="form-check-label" for="oldest">
+                            Oldest
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input opacity-75" type="radio" name="sort_by" id="least" value="least" {% if sort_by == "least" %} checked {% endif %}>
+                        <label class="form-check-label" for="least">
+                            Lowest price
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input opacity-75" type="radio" name="sort_by" id="most" value="most" {% if sort_by == "most" %} checked {% endif %}>
+                        <label class="form-check-label" for="most">
+                            Highest price
+                        </label>
+                    </div> 
+                    <div class="form-check">
+                        <input class="form-check-input opacity-75" type="radio" name="sort_by" id="bid_count_most" value="bid_count_most" {% if sort_by == "bid_count_most" %} checked {% endif %}>
+                        <label class="form-check-label" for="bid_count_most">
+                            Most bids
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input opacity-75" type="radio" name="sort_by" id="bid_count_fewest" value="bid_count_fewest" {% if sort_by == "bid_count_fewest" %} checked {% endif %}>
+                        <label class="form-check-label" for="bid_count_fewest">
+                            Fewest bids
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end">
+                    <input type="submit" value="go" class="btn btn-outline-primary opacity-75">
+                </div>
+            </form>
+
+        </article>
+
+    </div>
+</aside>
+
+</div>
+
+{% endblock %}
+
+
+{% block additional_js %}
+    <script src="{% static 'auctions/listings.js' %}"></script>
+    {% block additional_js_inherits_listings %}
+    {% endblock %}   
+{% endblock %}

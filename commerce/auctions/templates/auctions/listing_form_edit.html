@@ -1,0 +1,18 @@
+{% extends "auctions/listing_form_new.html" %}
+
+{% block heading_listing %}
+    Edit Listing
+{% endblock %}
+
+{% block warning_listing %} 
+    <div class="alert alert-warning d-flex gap-3 border border-warning border-2" role="alert">
+        <span class="fs-2"><i class="bi bi-exclamation-diamond"></i></span>
+        <span class="">Editing the listing will reset <strong>bids</strong>, <strong>comments</strong>, <strong>starting date</strong>, and <strong>duration</strong>.
+            <br>
+            Additionally, the listing will be marked as edited in any Watchlist and details page.</span>
+    </div>
+{% endblock %}
+
+{% block image_current %}
+    <div class="form-text pt-1">Currently: <a class="text-break link-primary text-decoration-none" href="{{ listing.image.url }}" target="_blank">{{imageName}}</a></div>
+{% endblock %}

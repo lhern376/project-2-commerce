@@ -1,0 +1,60 @@
+{% extends "auctions/listings_by_category.html" %}
+{% load static %}
+
+
+{% block listing_heading %}
+    My Listings
+{% endblock %}
+
+
+{% block customButton %}
+<!-- No button next to image (Leave blank) -->
+
+<!-- ---------------------------------------------------------------------------- -->
+{% endblock %}
+
+
+{% block listing_description_margin %} 
+mb-5
+{% endblock %}
+
+
+{% block listing_status %}
+    {% if listing.status == 'closed' %}
+        <span class="badge text-bg-danger">Closed</span>
+    {% else %}
+        {% if listing.was_edited %}
+        <span class="badge text-bg-warning">Edited: {{ listing.edit_count }}</span>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+
+{% block listings_owned_custom %}
+Set to start:
+{% endblock %}
+
+
+{% block listing_edit %}
+<p class="position-absolute bottom-0 end-0">
+    <a class="btn btn-outline-dark px-5" href="{% url 'listing-edit' listing.pk %}">Edit</a>
+</p>
+{% endblock %}
+
+
+{% block customMessage %}
+<div>
+    {% if search_criteria %} 
+        No results found. 
+    {% else %} 
+        No listings created. 
+    {% endif %}
+</div>
+{% endblock %}
+
+
+{% block additional_js_inherits_listings %}
+    
+{% endblock %}
+
+

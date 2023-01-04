@@ -1,0 +1,489 @@
+/* -------------------- General Styles -------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap');
+
+:root {
+    --tooltip-bg-color: #6c757d;
+    --tooltip-text-color: white;
+
+    --hover-watchlist-btn: rgba(108, 117, 125, 0.30);
+    --bg-watchlist-btn: rgba(108, 117, 125, 0.10);
+}
+
+/* html {
+    font-size: 14px;
+} */
+
+/* body {
+    font-size: 0.9375rem;
+} */
+
+.css-font {
+    font-family: "Ubuntu", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+}
+
+.css-font-bold {
+    font-weight: bold;
+}
+
+.wrapper-all {
+
+    max-width: 80rem;
+}
+
+/* works with ../images/imageName, does not work with auctions/images/imageName */
+/* .css-body {
+    background-image: url('../images/patrick-tomasso-QMDap1TAu0g-unsplash.jpg');
+} */
+
+
+/* -------------------- Header Styles -------------------- */
+
+/* header {
+    font-size: 0.875rem;
+} */
+
+/* -------------------- Navigation Styles -------------------- */
+
+/* .css-nav-link:hover {
+    border-color: #dee2e6 !important;
+} */
+
+
+@media screen and (max-width: 35.9375rem) {
+    /*575px*/
+
+    .section-login {
+
+        margin-top: 2rem !important;
+    }
+}
+
+@media screen and (min-width: 36rem) {
+    /*576px*/
+
+    .nav-item-responsive-margin {
+
+        /* margin-right: 5px; */
+        margin-right: 0.3125rem;
+    }
+
+}
+
+/* Tooltip */
+
+/* .tooltip-inner {
+    background: #6c757d;
+} */
+
+.tooltip {
+    opacity: 1 !important;
+}
+
+.tooltip-inner {
+    /* background: #0dcaf0; */
+    background: var(--tooltip-bg-color);
+    color: var(--tooltip-text-color);
+    box-shadow: 0 1px 3px 1px rgba(108, 117, 125, .2);
+}
+
+.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: var(--tooltip-bg-color);
+}
+
+.bs-tooltip-auto[data-popper-placement^=bottom] .tooltip-arrow::before {
+    border-bottom-color: var(--tooltip-bg-color);
+}
+
+.bs-tooltip-auto[data-popper-placement^=left] .tooltip-arrow::before {
+    border-left-color: var(--tooltip-bg-color);
+}
+
+.bs-tooltip-auto[data-popper-placement^=right] .tooltip-arrow::before {
+    border-right-color: var(--tooltip-bg-color);
+}
+
+
+/* -------------------- Main Styles -------------------- */
+
+main {
+    /* font-size: 0.875rem; */
+    min-height: 100vh;
+}
+
+
+
+/* -------------------- Login, Register Form Styles -------------------- */
+
+.wrapper-form {
+
+    max-width: 31.25rem;
+    /* max-width: 500px; */
+}
+
+.css-list-unstyled ul {
+    margin-left: 0;
+    margin-bottom: .2rem;
+    /* padding-left: 0; */
+    /* list-style: none; */
+}
+
+
+/* -------------------- Category List Styles -------------------- */
+
+.css-category-item,
+.css-category-tag {
+    box-shadow: 0.25rem 0.25rem 0.6rem rgba(0, 0, 0, 0.05), 0 0.5rem 1.125rem rgba(75, 0, 0, 0.05);
+}
+
+.css-category-item:hover {
+
+    box-shadow: none !important;
+    text-decoration: underline !important;
+}
+
+.css-category-tag {
+
+    border-top-right-radius: 1rem;
+    border-top-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+
+    /* background: rgb(125, 207, 104);
+    background: linear-gradient(90deg, rgba(125, 207, 104, 0.8477766106442577) 66%, rgba(238, 224, 71, 0.6012780112044818) 98%); */
+
+    background: rgb(238, 224, 71);
+    background: linear-gradient(90deg, rgba(238, 224, 71, 0.6012780112044818) 7%, rgba(125, 207, 104, 0.8477766106442577) 45%);
+
+    top: -10%;
+    left: 97%;
+    /* transform: translate(-50%, -50%); */
+
+    z-index: 2000;
+}
+
+.css-category-tag:hover {
+    cursor: default;
+}
+
+
+
+/* -------------------- Lists (active listing, category listing, watchlist) Styles -------------------- */
+
+.wrapper-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.wrapper-content section {
+    flex: 1;
+}
+
+/* list heading */
+.css-wrapper-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+/* modal */
+.css-modal-content {
+    /* 266px */
+    max-width: 16.625rem;
+}
+
+/* setting ul min height to not mess up fade animation in the watchlist when removing items */
+/* .css-ul {
+    min-height: 100vh;
+} */
+
+/* search results hints */
+.wrapper-search-hint {
+    display: flex;
+}
+
+.wrapper-search-hint span {
+    /* width: 100px; */
+    width: 6.25rem;
+}
+
+/* ---- filter form ---- */
+.wrapper-content aside {
+    display: none;
+    /* 300px */
+    flex: 0 0 18.75rem;
+}
+
+.wrapper-img {
+    /* 230px */
+    width: 14.375rem;
+    height: 14.375rem;
+}
+
+.wrapper-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.link-hover:hover {
+    text-decoration: underline !important;
+}
+
+/* listings button styles */
+.highlight-btn {
+    background-color: var(--bg-watchlist-btn);
+}
+
+.highlight-btn:hover,
+.highlight-btn:active {
+    background-color: var(--hover-watchlist-btn) !important;
+}
+
+.highlight-btn:active {
+    border-color: white !important;
+}
+
+/* watchlist button styles */
+.watchlist-btn {
+    background-color: var(--bg-watchlist-btn);
+    box-shadow: 1px 1px 2px 0 crimson;
+}
+
+.watchlist-btn:hover,
+.watchlist-btn:active {
+    border-color: crimson !important;
+}
+
+/* watchlist listing-removed animation */
+@keyframes hide {
+    0% {
+        /* initial settings */
+        opacity: 1;
+        height: 100%;
+    }
+
+    75% {
+        /* spend 75% of its time changing the opacity from 1 to 0 */
+        opacity: 0;
+        height: 100%;
+    }
+
+    100% {
+        /* spends the rest of the time moving all of its height-related attributes to 0 */
+        opacity: 0;
+        height: 0;
+        margin-bottom: -17.4rem;
+    }
+}
+
+.animated-li {
+    animation-name: hide;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+/* watchlist listing-removed animation in gallery view */
+
+@keyframes hideGalleryMode {
+    0% {
+        /* initial settings */
+        opacity: 1;
+        height: 100%;
+    }
+
+    75% {
+        /* spend 75% of its time changing the opacity from 1 to 0 */
+        opacity: 0;
+        height: 100%;
+    }
+
+    100% {
+        /* spends the rest of the time moving all of its height-related attributes to 0 */
+        opacity: 0;
+        height: 0;
+        margin-bottom: -17.4rem;
+    }
+}
+
+.animated-li-gallery {
+    animation-name: hideGalleryMode;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+/* ------------------------------- */
+
+
+@media screen and (max-width: 35.9375rem) {
+    /*575px*/
+
+    .wrapper-description {
+        /* 400px */
+        max-width: 25rem;
+    }
+
+    .wrapper-img {
+        margin-right: 0 !important;
+    }
+}
+
+@media screen and (min-width: 62rem) {
+    /* 992px */
+
+    .wrapper-content aside {
+        display: block;
+    }
+}
+
+
+.css-switch {
+    display: none;
+}
+
+/* Gallery view */
+/* This code below only runs when .css-wrapper-ul is applied by turning on gallery mode through javascript */
+/* Notice how the selectors all start with the dynamically added class .css-wrapper-ul */
+
+.wrapper-description {
+    min-width: 17.5rem;
+}
+
+@media screen and (min-width: 36rem) {
+    /*576px*/
+
+    .css-wrapper-ul .wrapper-description {
+        /* 400px */
+        max-width: 25rem;
+    }
+}
+
+@media screen and (min-width: 40.625rem) {
+
+    /* 650px */
+    .css-switch {
+        display: block;
+    }
+
+    .css-wrapper-ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .css-wrapper-ul li {
+        /* min-width: 300px; */
+        /* max-width: 450px; */
+        /* flex: 0 0 280px; */
+        flex: 0 0 17.5rem;
+    }
+
+    .css-wrapper-ul .wrapper-description {
+        /* 400px */
+        /* resets max-width of this same selector declared right above this media query */
+        max-width: none;
+    }
+}
+
+
+
+/* -------------------- Listing Details Styles -------------------- */
+
+.css-details-image-wrapper {
+    /* 500px x 500px */
+    height: 31.25rem;
+    /* min-width: 31.25rem; */
+    width: 31.25rem;
+}
+
+.css-details-image-wrapper img {
+    max-width: 99%;
+    max-height: 99%;
+    /* object-fit: contain; */
+}
+
+.css-details-description {
+    min-height: 30vh;
+}
+
+.css-details-grid-wrapper {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    column-gap: 1rem;
+}
+
+/* closed bidding */
+.css-details-grid-wrapper-closed {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    column-gap: 1rem;
+    row-gap: .4rem;
+}
+
+.css-details-image-wrapper-closed {
+    /* 200px x 200px */
+    height: 12.5rem;
+    /* min-width: 31.25rem; */
+    width: 12.5rem;
+}
+
+.css-details-image-wrapper-closed img {
+    max-width: 99%;
+    max-height: 99%;
+    /* object-fit: contain; */
+}
+
+@media screen and (max-width: 61.9375rem) {
+
+    /* 991px */
+    .css-details-image-wrapper {
+        /* 400px */
+        width: 25rem;
+        height: 25rem;
+    }
+}
+
+@media screen and (max-width: 35.9375rem) {
+
+    /* 575px */
+    .css-details-image-wrapper {
+        /* 300px */
+        width: 18.75rem;
+        height: 18.75rem;
+    }
+}
+
+
+/* -------------------- Listing Bid History Styles -------------------- */
+
+.css-history-image-wrapper {
+    /* 112px x 112px */
+    height: 7rem;
+    /* min-width: 31.25rem; */
+    width: 7rem;
+}
+
+.css-history-image-wrapper img {
+    max-width: 99%;
+    max-height: 99%;
+    /* object-fit: contain; */
+}
+
+.css-history-title {
+    width: 31.25rem;
+    line-height: 1.2;
+}
+
+.css-history-title a:hover {
+    text-decoration: underline !important;
+}
+
+.css-first-child tr:first-child {
+    font-weight: bold;
+}
+
+.css-hover-title:hover {
+    background-color: #cff4fc;
+}

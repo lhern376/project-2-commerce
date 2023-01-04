@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>All Categories</h2>
+
+    <div class="py-3"></div>
+
+    <ul class="list-unstyled container-fluid border shadow rounded py-3 mb-5">
+    {% for category in categories %}
+
+        <!-- <li class="p-3 mb-3 border rounded shadow-sm d-flex"> -->
+        <li class="w-75 position-relative">
+            <a class="p-3 mb-3 border rounded d-block text-decoration-none link-secondary css-category-item" href="{% url 'listings-by-category' category.category.category_string %}">{{ category.category.category_name }}</a>
+            {% if category.available %}
+            <span class="position-absolute border border-1 p-1 pt-3 fw-bold text-light css-category-tag">available</span>
+            {% endif %}
+        </li>
+
+    {% empty %}
+        <li>No categories</li>
+    {% endfor%}
+    </ul>
+
+{% endblock %}
+
+{% block additional_js %}
+
+{% endblock %}

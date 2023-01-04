@@ -1,0 +1,104 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if listing_has_not_started %}
+
+        <div class="mb-4 alert alert-info border border-2 border-info" role="alert">
+            <span class="align-middle fs-4"><i class="bi bi-file-lock2"></i></span>
+            <span class="align-middle fs-5">This listing is not active.</span>
+            <div class="pt-2"><span class="fw-bold">Starts </span>{{ listing.bidding_starts|date:"N d, Y - h:i A T" }}</div>
+        </div>
+
+    {% endif %}
+
+    <h2>Bid History</h2>
+
+    <div class="py-3"></div>
+
+    <div class="container-fluid border shadow rounded p-3 mb-5" style="min-height: 90vh;">
+
+        {% if listing.status == 'closed' %}
+            <div class="mb-4 alert alert-danger border-0 border-start border-4 border-danger" role="alert">
+                <span class="fs-4 align-middle"><i class="bi bi-exclamation-diamond"></i></span> 
+                <span class="align-middle">This item has ended.</span>
+            </div>
+        {% endif %}
+
+        <div class="d-flex gap-3 mb-4">
+            <div class="align-self-center flex-shrink-0 img-thumbnail bg-light d-flex justify-content-center align-items-center css-history-image-wrapper">
+                <img class="" src="{{ listing.image.url }}" alt="Image for: {{ listing.title }}">
+            </div>
+            <div class="pt-2 fs-4 css-history-title">
+                <div><a class="link-dark css-hover-title" href="{% url 'listing-details' listing.id %}">{{ listing.title }}</a></div>
+            </div>
+        </div>
+
+        <div class="py-3"></div>
+
+        <div class="mb-4 css-details-grid-wrapper">
+            {% if listing.bid_count > 0 %}
+                {% if listing.status == 'closed' %}
+                    <span class="text-end">Winning bid:</span>
+                {% else %}
+                    <span class="text-end">Current bid:</span>
+                {% endif %}
+            {% else %}
+                <span class="text-end">Starting bid:</span>
+            {% endif %}
+            <span class="fw-bold">${{listing.current_price}}</span>
+            <span class="text-end">Bids:</span>
+            <span>{{listing.bid_count}}</span>
+            <span class="text-end">Bidders:</span>
+            <span>{{bidders_count}}</span>
+            {% if listing.status == 'closed' %}
+                <span class="text-end">Ended:</span>
+                <span>
+                    {{ listing.bidding_ended|date:"N d, Y - h:i A T" }}
+                </span>
+            {% else %}
+                <span class="text-end">Ends:</span>
+                <span>
+                    {% if listing.listing_ends == "No date set" %}
+                        {{ listing.listing_ends }}
+                    {% else %}
+                        {{ listing.listing_ends|date:"N d, Y - h:i A T" }}
+                    {% endif %}
+                </span>
+            {% endif %}
+        </div>
+
+        <div>
+            <a href="https://www.liveabout.com/how-do-ebay-bid-increments-work-1140154" target="_blank" class="text-decoration-none">
+                <span class="text-decoration-underline">Learn about bid increments</span> 
+                <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
+
+        <div class="py-3"></div>
+
+        <div>
+            <table class="table table-bordered">
+                <thead class="" style="font-size: .8rem;">
+                    <tr class="table-active" >
+                        <th>Bidder</th><th>Bid Amount</th><th>Bid Time</th>
+                    </tr>
+                </thead>
+                <tbody class="css-first-child" style="font-size: .9rem;">
+                    {% for bid in bids %}
+                    <tr class="">
+                        <td>{{ bid.bidder }}</td><td>${{ bid.amount }}</td><td>{{ bid.date|date:"N d, Y - h:i:s A T" }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-info">
+                        <td>Starting price</td><td>${{ listing.starting_price }}</td><td>{{ listing.bidding_starts|date:"N d, Y - h:i:s A T" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block additional_js %}
+
+{% endblock %}

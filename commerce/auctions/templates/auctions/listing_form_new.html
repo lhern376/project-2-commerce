@@ -1,0 +1,102 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<h2>{% block heading_listing %}New Listing{% endblock %}</h2>
+<div class="py-3"></div>
+
+<div class="list-unstyled container-fluid border shadow rounded py-3 mb-5">
+
+    {% block warning_listing %} {% endblock %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-warning d-flex align-items-center border-0 border-start border-5 border-warning" role="alert">
+            <i class="bi flex-shrink-0 me-2 bi-exclamation-diamond"></i>
+            <div>{{ form.non_field_errors }}</div>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="js-create-form">
+        {% csrf_token %}
+        <fieldset class="form-group p-3">
+            <legend class="mb-4">Required Information</legend>
+            <div class="mb-4">
+                <label for="title" class="form-label">Title</label>
+                <div class="text-danger css-list-unstyled">{{ form.title.errors }}</div>
+                <input type="text" class="form-control" id="title" name="title" {% if title %} value="{{title}}" {% endif %} required autofocus>
+                <div class="form-text">Provide a title for the product.</div>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="form-label">Description</label>
+                <div class="text-danger css-list-unstyled">{{ form.description.errors }}</div>
+                <textarea class="form-control" name="description" id="description" cols="30" rows="5" required placeholder="{{ placeholder_description }}">{% if description %}{{description}}{% endif %}</textarea>
+                <div class="form-text">Provide product details (i.e.: dimensions and condition).</div>
+            </div>
+            <div class="mb-4" style="max-width: 18.75rem;">
+                <label class="form-label">Category</label>
+                <div class="text-danger css-list-unstyled">{{ form.category.errors }}</div>
+                {{ form.category }}
+            </div>
+            <div class="mb-4" style="max-width: 18.75rem;">
+                <label for="id_starting_price" class="form-label">Starting price</label>
+                <div class="text-danger css-list-unstyled">{{ form.starting_price.errors }}</div>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="tel" name="starting_price" {% if starting_price %} value="{{starting_price}}" {% endif %} required placeholder="Initial bidding price" id="id_starting_price" pattern="^\d*\.?\d*$" onclick="this.value=''" class="form-control">
+                </div>
+                <div class="form-text">Enter a dollar amount.</div>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group p-3">
+            <legend class="mb-4">Optional Info</legend>
+            <div class="mb-4">
+                <label for="formFile" class="form-label">Product Image</label>
+                {% if imageReminder %}
+                <div class="text-danger css-list-unstyled"><ul><li>{{imageReminder}}</li></ul></div>
+                {% endif %}
+                <div class="text-danger css-list-unstyled">{{ form.image.errors }}</div>
+                <input class="form-control text-secondary" type="file" id="formFile" name="image" accept="image/*" {% if imageName %} value="{{imageName}}" {% endif %}>
+                {% block image_current %}{% endblock %}
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group p-3">
+            <legend class="mb-4">Optional Settings</legend>
+            <div class="mb-4" style="max-width: 18.75rem;">
+                <label for="bidding_starts" class="form-label">Starting Date</label>
+                <div class="text-danger css-list-unstyled">{{ form.bidding_starts.errors }}</div>
+                <input type="datetime-local" class="form-control" id="bidding_starts" name="bidding_starts" min="{{ date.starts_min }}" max="{{ date.ends_max }}" {% if bidding_starts %} value="{{bidding_starts}}" {% endif %}>
+                <div class="form-text">Specify when the listing will become active after posting it (maximum 3 days ahead from today).</div>
+            </div>
+            <div class="mb-4" style="max-width: 18.75rem;">
+                <label for="duration" class="form-label">Duration</label>
+                <div class="text-danger css-list-unstyled">{{ form.duration.errors }}</div>
+                <div class="input-group">
+                    <input type="number" class="form-control" id="durationValue" name="duration" min="{{ date.lasts_min }}" max="{{ date.lasts_max }}" {% if duration %} value="{{duration}}" {% endif %}>
+                    <span class="input-group-text">day(s)</span>
+                </div>
+                <div class="form-text">
+                    Specify for how long the listing will be active (1 - 3 days). 
+                </div>
+            </div>
+            <div class="alert alert-warning" role="alert">
+                Leave <strong>starting date</strong> blank if the listing should become active immediately after posting it.
+            </div>
+            <div class="alert alert-warning" role="alert">
+                Leave <strong>duration</strong> blank if the listing should be active indefinitely until manually closed.
+            </div>
+        </fieldset>
+
+        <!-- <input type="hidden" value="" name="imageFileName" id="imageFilename">
+        <input type="hidden" name="duration" value="" id="duration"> -->
+        <div class="form-group mx-auto w-50">
+            <button type="submit" class="btn btn-outline-primary w-100">Post</button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}
+
+

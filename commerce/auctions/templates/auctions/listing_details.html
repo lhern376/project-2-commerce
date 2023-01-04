@@ -1,0 +1,339 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load tz %}
+
+
+{% block body %}
+    {% if listing.status == 'closed' %}
+    <!-- 3. Show closed listing information -->
+    <div class="mb-4 alert alert-warning border-0 border-start border-4 border-warning" role="alert">
+        <span class="align-middle">Bidding has ended on this item.</span>
+    </div>
+    <div class="mb-1 fw-bold fs-5">{{listing.title}}</div>
+    <div class="mb-4 d-flex flex-column flex-sm-row gap-3">
+
+        <div class="position-relative flex-shrink-0 img-thumbnail bg-light d-flex justify-content-center align-items-center css-details-image-wrapper-closed">
+            <img class="" src="{{ listing.image.url }}" alt="Image for: {{ listing.title }}">
+            {% if listing.bid_count > 0 %}
+                <img class="position-absolute bottom-0 end-0" src="{% static 'auctions/images/imgSold_96x96.png' %}" alt="Item Sold">
+            {% else %}
+                <img class="position-absolute bottom-0 end-0" src="{% static 'auctions/images/imgEnded_96x96.png' %}" alt="Item Ended">
+            {% endif %}
+        </div>
+        <div class="align-self-sm-center css-details-grid-wrapper-closed">
+            <span class="text-end">Ended:</span>
+            <span>
+                {{ listing.bidding_ended|date:"N d, Y - h:i A T" }}
+            </span>
+            {% if listing.bid_count > 0 %}
+                <span class="text-end">Winning bid:</span>
+            {% else %}
+                <span class="text-end">Starting bid:</span>
+            {% endif %}
+            <span>
+                <span class="fw-bold">${{listing.current_price}}</span>
+                <span class="align-top" style="font-size: .9rem;">[ <a href="{% url 'listing-bid-history' listing.id %}">{{ listing.bid_count }} bids</a> ]</span>
+            </span>
+            <span class="text-end">Seller:</span>
+            <span class="fw-bold">{{listing.seller}}</span>
+        </div>
+
+    </div>
+    <hr>
+    {% else %}
+    <!-- Show active listing information -->
+        {% if user == listing.seller %}
+        <!-- 2. Show owner functionality (close and edit features) -->
+        <div class="alert alert-warning border border-warning border-2 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-4" role="alert">
+            <div class="">You own this listing.</div>
+            <div class="d-flex flex-wrap gap-3">
+                <a class="btn btn-outline-warning px-5 text-reset flex-fill" href="{% url 'listing-edit' listing.pk %}">Edit</a>
+                <!-- warn user if there is no bid before closing -->
+                <a class="btn btn-outline-warning px-5 text-reset flex-fill" href="{% url 'listing-close' listing.pk %}">Close</a>
+            </div>
+        </div>
+
+        {% endif %}
+        <!-- 1. Regular users start here -->
+        <div class="py-3"></div>
+
+        <div class="d-flex flex-column flex-lg-row gap-3 mb-4">
+            <div class="align-self-center align-self-lg-start flex-shrink-0 img-thumbnail bg-light d-flex justify-content-center align-items-center css-details-image-wrapper">
+                <img class="" src="{{ listing.image.url }}" alt="Image for: {{ listing.title }}">
+            </div>
+            <div class="flex-grow-1 p-3">
+                <div class="border-bottom">
+                    <span class="fw-bold fs-5">{{ listing.title }}</span> 
+                    {% if listing.was_edited %}
+                        <div><span class="badge text-bg-warning">Edited: {{ listing.edit_count }}</span></div>
+                    {% endif %}
+                    <br><br>           
+                </div>
+                <div class="py-5 border-bottom text-secondary css-details-grid-wrapper">
+                    <span class="text-end">Seller:</span> 
+                    <span class="fw-bold">{{ listing.seller }}</span>
+                    <span class="text-end">Watchers:</span>
+                    <span class="fw-bold js-details-watcher-count">{{ listing.watcher_count }}</span>
+                    <span class="text-end">Ends:</span>  
+                    <span class="fw-bold">
+                        {% if listing.listing_ends == "No date set" %}
+                            {{ listing.listing_ends }}
+                        {% else %}
+                            {{ listing.listing_ends|date:"N d, Y - h:i A T" }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="py-5">
+                    <div class="css-details-grid-wrapper align-items-center text-secondary">
+                        {% if listing.bid_count > 0 %}
+                            <span>Current bid:</span>
+                        {% else %}
+                            <span>Starting bid:</span>
+                        {% endif %}
+                        <span class="text-dark fw-bold fs-5">${{ listing.current_price }}</span>
+                    </div>
+                    <div style="font-size: .9rem;" class="text-secondary">
+                    {% if listing.bid_count > 0 %}
+                        Minimun bid ${{ listing.get_min_bid_amount }} or more.
+                    {% else %}
+                        Minimun bid ${{ listing.current_price }} (starting bid) or more.
+                    {% endif %}
+                    </div>
+                    <div class="pt-3 d-flex flex-column gap-2 align-items-center">
+                        <div style="font-size: .9rem;">[ <a href="{% url 'listing-bid-history' listing.id %}">{{ listing.bid_count }} bids</a> ]</div>
+{% if user.is_authenticated %}
+                        {% if user == listing.seller %}
+                        <div class="w-50" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Cannot bid on owned listings">
+                            <button type="button" class="btn btn-primary w-100 fw-bold js-bid-form-btn disabled" data-js-listing-start-date="{{listing.bidding_starts|utc|date:'c'}}">Place bid</button>
+                        </div>
+                        {% else %}
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary w-50 fw-bold js-bid-form-btn" data-bs-toggle="modal" data-bs-target="#staticBackdrop" data-js-listing-id="{{listing.pk}}" data-js-listing-start-date="{{listing.bidding_starts|utc|date:'c'}}">
+                            Place bid
+                        </button>
+                        {% endif %}
+
+<!-- Modal for bidding functionality -->
+<div class="modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-4" id="staticBackdropLabel">Place your bid</h1>
+                <button type="button" class="btn-close js-bid-form-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- loading spinner -->
+            <div class="d-none d-flex flex-column gap-2 justify-content-center align-items-center js-bid-loading-spinner" style="height: 20vh;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="" style="font-size: .9rem;">Loading...</div>
+            </div>
+            <!-- success message -->
+            <div class="d-none d-flex flex-column gap-2 justify-content-center align-items-center js-bid-success" style="height: 20vh;">
+                <div class="alert alert-success border border-success border-1 w-75" role="alert">
+                    Bid placed successfully! Close this pop-up.
+                </div>
+            </div>
+            <!-- modal body -->
+            <div class="d-none modal-body p-4 js-bid-form">
+                <!-- error message -->
+                <div class="d-none alert alert-danger border border-danger border-1 js-error" role="alert"></div>
+                <div class="">
+                    $<span class="fw-bold js-current-price">{# listing.current_price #}</span>
+                </div>
+                <div class="text-secondary" style="font-size: .9rem">
+                    <span class="js-bids"></span>
+                </div>
+                <div class="text-secondary" style="font-size: .9rem">
+                    <span>Ends -</span>
+                    <span>
+                        {% if listing.listing_ends == "No date set" %}
+                            {{ listing.listing_ends }}
+                        {% else %}
+                            {{ listing.listing_ends|date:"N d, Y - h:i A T" }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="pt-3 d-flex gap-3 align-items-center justify-content-center css-font">
+                    <span class="">Minimun</span>
+                    <button class="btn btn-primary fw-bold px-5 js-min-bid-btn" data-js-min-bid="" style="font-size: .9rem">Bid ${#listing.get_min_bid_amount#}</button> 
+                </div>
+                <div class="py-3 d-flex gap-3 align-items-center">
+                    <div class="border-bottom flex-grow-1" style="height: .1rem"></div>
+                    <div style="font-size: .9rem">or</div>
+                    <div class="border-bottom flex-grow-1" style="height: .1rem"></div>
+                </div>
+                <form action="" method="get" class="js-custom-bid-form">
+                <div class="d-flex gap-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">$</span>
+                        <input class="form-control js-custom-bid-input" type="tel" onclick="this.value=''" pattern="^\d*\.?\d*$" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary fw-bold px-5 css-font" style="font-size: .9rem">Bid</button>
+                </div>
+                </form>
+                <div class="text-secondary pt-2" style="font-size: .9rem;">Enter a dollar amount equal to or greater than minimun bid.</div>
+            </div>
+        </div>
+    </div>
+</div>
+                        
+
+{% else %}
+<div class="w-50" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Log in to place bids">
+    <button type="button" class="btn btn-primary w-100 fw-bold disabled">Place bid</button>
+</div>
+{% endif %}
+                        <!-- watchlist functionality uses javascript in listings.js  -->
+                        {% if user.is_authenticated %}
+                            {% if listing in user.get_watchlist %}
+                            <span class="btn fs-5 rounded-5 highlight-btn js-watchlist-btn w-50" 
+                                    title="remove from watchlist" data-js-action="remove" data-js-id="{{listing.id}}">
+                                <div class="text-dark"><i class="bi bi-heart-fill"></i></div>
+                            </span>
+                            {% else %}
+                            <span class="btn fs-5 rounded-5 highlight-btn js-watchlist-btn w-50" 
+                                    title="add to watchlist" data-js-action="add" data-js-id="{{listing.id}}">
+                                <div class="text-dark"><i class="bi bi-heart"></i></div>
+                            </span>
+                            {% endif %}
+                        {% else %}
+                        <span class="btn fs-5 rounded-5 highlight-btn w-50" 
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Log in to add to watchlist">
+                            <div class="text-dark"><i class="bi bi-heart"></i></div>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- ends what is shown if listing is active -->
+    {% endif %} 
+
+        <div>
+            <h3>Product Description</h3>
+            <div class="border rounded bg-light p-3 mb-4 css-details-description">
+                <pre class="css-font" >{{ listing.description }}
+                </pre>
+            </div>
+        </div>
+        
+        <div>
+            <h3>Comments</h3>
+            <div class="border rounded bg-light p-3">
+                <!-- Make a comment -->
+                {% if listing.status == 'active' %}
+                    {% if user.is_authenticated %}
+                    <form action="" method="post" class="js-form-comment" data-js-listing="{{listing.pk}}">
+                    {% csrf_token %}
+                    <div class="d-flex flex-column gap-2 mb-5">
+                        <textarea class="form-control" name="comment" id="" cols="30" rows="2" placeholder="Add a comment..."></textarea>
+                        <!-- <button type="submit" class="btn btn-sm btn-light shadow-sm link-dark border border-secondary border-1 px-5 rounded-pill align-self-end">Comment</button> -->                    
+                        <button type="submit" class="btn btn-sm btn-outline-dark px-5 rounded-5 align-self-end">Comment</button>
+                    </div>
+                    </form>
+                    {% else %}
+                        <div class="p-3 mb-5 bg-white border" style="font-size: .9rem;">
+                            <a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to post comments and replies.
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="p-3 mb-5 bg-white border" style="font-size: .9rem;">
+                        <span class="align-middle fs-4"><i class="bi bi-file-lock2"></i></span>
+                        <span class="align-middle">Closed for comments. Bidding has ended on this item.</span>
+                    </div>
+                {% endif %}
+
+                <!-- Comments and replies with reply button -->
+                {% if listing.listing_comments %}
+                    {# for comment in listing.listing_comments.all #}
+                    {% for comment in listing.get_listing_comments %}
+                    {% if comment.status == "comment" %}
+                    <div class="js-comments-container mb-5">
+                        
+                        <div>
+                        <div class="d-flex flex-column gap-2 mb-4 border-top border-4" style="min-height: 3rem;">
+                            <div class="border-start border-5 border-warning px-2">
+                                <div class="d-flex justify-content-between border-bottom border-1 p-2">
+                                    <span class="text-secondary fw-bold">{{ comment.user }}</span>
+                                    <span class="text-secondary" style="font-size: 0.9rem;">({{ comment.date|date:"N d, Y - h:i A T"}})</span>
+                                </div>
+                                <pre class="css-font p-2">{{ comment.comment }}
+                                </pre>
+                            </div>
+                            {% if user.is_authenticated and listing.status == 'active' %}
+                            <a class="btn btn-sm btn-light shadow-sm rounded-pill link-dark border border-1 px-5 align-self-start" data-bs-toggle="collapse" href="#replyBlock{{comment.pk}}">
+                                Reply
+                            </a>
+                            <div class="collapse" id="replyBlock{{comment.pk}}">
+                                <form action="" method="post" class="js-form-reply" data-js-comment="{{comment.pk}}">
+                                    <div class="d-flex flex-column gap-2 mb-3">
+                                        <textarea class="form-control" name="comment" id="" cols="30" rows="2" placeholder="Add a reply..."></textarea>
+                                        <!-- <button type="submit" class="btn btn-sm btn-light shadow-sm link-dark border border-secondary border-1 px-5 rounded-pill align-self-end">Send</button> -->                                        
+                                        <button type="submit" class="btn btn-sm btn-outline-dark px-5 rounded-5 align-self-end">Send</button>                                        
+                                    </div>
+                                </form>
+                            </div>
+                            {% else %}
+                            <div class="px-2"><div class="border-bottom border-1"></div></div>
+                            {% endif %}
+                        </div>
+                        </div>
+
+                        {% if comment.comment_replies %}
+                            {# for reply in comment.comment_replies.all #}
+                            {% for reply in comment.get_comment_replies %}
+                            <!-- same chunk of code as above but different variable: 'reply' -->
+                            <div class="js-replies-container ps-5">
+
+                                <div>
+                                <div class="d-flex flex-column gap-2 mb-4" style="min-height: 3rem;">
+                                    <div class="border-start border-5 px-2">
+                                        <div class="d-flex justify-content-between border-bottom border-1 p-2">
+                                            <span class="text-secondary fw-bold">{{ reply.user }}</span>
+                                            <span class="text-secondary" style="font-size: 0.9rem;">({{ reply.date|date:"N d, Y - h:i A T"}})</span>
+                                        </div>
+                                        <pre class="css-font p-2">{% if reply.reply_to %}<span class="text-primary">@{{ reply.reply_to }}  </span>{% endif %} {{ reply.comment }}
+                                        </pre>
+                                    </div>
+                                    {% if user.is_authenticated and listing.status == 'active' %}
+                                    <a class="btn btn-sm btn-light shadow-sm rounded-pill link-dark border border-1 px-5 align-self-start" data-bs-toggle="collapse" href="#replyBlock{{reply.pk}}">
+                                        Reply
+                                    </a>
+                                    <div class="collapse" id="replyBlock{{reply.pk}}">
+                                        <form action="" method="post" class="js-form-reply" data-js-comment="{{comment.pk}}" data-js-reply-to="{{reply.user}}">
+                                            <div class="d-flex flex-column gap-2 mb-3">
+                                                <textarea class="form-control" name="reply" id="" cols="30" rows="2" placeholder="Add a reply..."></textarea>
+                                                <!-- <button type="submit" class="btn btn-sm btn-light shadow-sm link-dark border border-secondary border-1 px-5 rounded-pill align-self-end">Send</button> -->                                              
+                                                <button type="submit" class="btn btn-sm btn-outline-dark px-5 rounded-5 align-self-end">Send</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                </div>
+                            
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                
+                {% endif %}
+            </div>
+        </div>
+
+    {# endif #}
+
+{% endblock %}
+
+
+
+{% block additional_js %}
+    {% if user.is_authenticated and listing.status == 'active' %}
+        <script src="{% static 'auctions/listing_details.js' %}"></script>
+    {% endif %}
+{% endblock %}

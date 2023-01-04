@@ -1,0 +1,173 @@
+>>  superuser:
+
+    lhern376
+    college email
+    college email password
+
+
+>>  images
+
+    src="https://i.ebayimg.com/images/g/GK4AAOSwK5FjfubK/s-l500.jpg"
+    src="https://i.ebayimg.com/images/g/5ikAAOSwLQljhZCg/s-l500.jpg"
+    src="https://i.ebayimg.com/images/g/PAgAAOSwMyRjgS-f/s-l500.jpg"
+    src="https://i.ebayimg.com/images/g/Ub8AAOSwwN9jgOcQ/s-l500.jpg"
+
+
+# default storage searches by default in the media directories defined in settings.py (MEDIA_ROOT, MEDIA_URL)
+# In this case, it searches in folder 'media'
+from django.core.files.storage import default_storage
+
+    # erase old image in the filesystem when a new one is saved
+        if self.image.name != "default.jpg":
+            filename = self.image.name
+            print(f"\nGETTING FILENAME: {filename}\n")
+            if default_storage.exists(filename):
+                print("\nERASE FILE\n")
+                default_storage.delete(filename)
+
+>>  images css
+
+    - either:
+
+        container {
+            width: 200px;
+        }
+        img {
+            max-width: 100%;
+            vertical-align: middle;
+        }
+
+    - or: 
+
+        container {
+            width: 200px;
+            height: 150px;
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+
+>>      form and file uploads:
+
+        - in template:
+
+            form method="post" enctype="multipart/form-data"
+
+        - in views.py:
+
+            access image files width
+
+                request.FILES
+
+
+>>      preventing page reload on form submission:
+
+        - on a event handler function, not on the event handler itself, do the following:
+
+        function submitForm() {
+
+            const form = document.querySelector('.form-class');
+            form.submit();
+            form.reset();   // if resetting form is desired
+            return false;
+
+        }
+
+
+>>  	Notes on Forms and accessing form pages
+
+
+        -- in template (default template name listing_form for CreateView and UpdateView)
+
+        <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+            <fieldset class="from-group">
+                <legend class="border-bottom mb-4">Listing</legend>
+                {{ form.as_div }}
+            </fieldset>
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-info">Post</button>
+            </div>
+        </form>
+
+        - typical test to show user specific info
+
+            {% if listing.seller == user %} 
+
+        
+        -- using CreateView (the template that this view uses expects 'form' as the context)
+
+class ListingCreateView(CreateView):
+
+    model = ListingCreateView
+    fields = ["title", etc]  # dont include the field for the 'user', see below in form_valid() how to deal with tracking request.user
+    form_class = ...
+    success_url = ... # not necessary as it automatically uses get_absolute_url() if the model defined it
+
+    def form_valid(self, form):
+        # necessary step to set 'user'/'user_id' when they're part of a foreign key relationship
+        form.instance.seller = self.request.user
+        return super().form.valid(form)
+
+    - used with the UserPassesTestMixin in class based views
+
+        def test_func(self) -> bool:
+            listing = self.get_object()
+            return self.request.user == listing.seller
+        
+
+>>  	TODO
+
+        - views that automatically close bid
+
+            listing
+            Watchlist
+            my-listings
+
+
+        - views that trigger closing action:
+
+            edit
+
+            bid-history
+
+            listing-details
+
+            place-bid
+
+            get-bid
+
+            comment
+
+        - in my-listings:
+
+            - filter by active and closed listings. No deletes
+
+        - in both my-listings and Watchlist:
+
+            - mark closed listings as 'closed'
+
+            - mark edited listings as 'edited by owner' (needs a field in models and needs to show in all lists)
+            and restrict 'bidding_starts' to .now()
+
+                - message:
+
+                    'Editing the listing will reset bids and comments. Furthermore, The listing will be flagged as edited in any Watchlist'
+                    
+                    'Edited listings will become active immediately after posting it.'
+
+
+
+
+
+
+
+
+	
+
+    
+
+            

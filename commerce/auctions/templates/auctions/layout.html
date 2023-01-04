@@ -1,0 +1,119 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Auctions{% endblock %}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+        <link href="{% static 'auctions/css/styles.css' %}" rel="stylesheet">
+    </head>
+    <body class="">
+    <div class="container-fluid">
+
+    <header class="bg-light rounded-1 py-3 mb-3 border-bottom shadow-sm border-4">
+    <div class="container-fluid wrapper-all">
+        <h1>Auctions</h1>
+        <div class="text-secondary" style="--bs-text-opacity: .8">
+            {% if user.is_authenticated %}
+                Signed in as <strong>{{ user.username }}</strong>.
+            {% else %}
+                Not signed in.
+            {% endif %}
+        </div>
+
+        <nav class="navbar navbar-expand-sm">
+            <div class="container-fluid">
+                <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse flex-wrap justify-content-between" id="navbarSupportedContent">
+                    <!-- <hr class="d-sm-none"> -->
+                    <div class="d-sm-none py-3"></div>
+                    <ul class="navbar-nav mt-3 d-flex flex-wrap">
+                        <li class="nav-item nav-item-responsive-margin">
+                            <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 {% if cue == 'all' %} text-decoration-underline {% endif %}" href="{% url 'listings' %}">Active Listings</a>
+                        </li>
+                        <li class="nav-item nav-item-responsive-margin">
+                            <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 {% if cue == 'category' %} text-decoration-underline {% endif %}" href="{% url 'categories' %}">Categories</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item nav-item-responsive-margin">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 {% if cue == 'watchlist' %} text-decoration-underline {% endif %}" href="{% url 'listings-watchlist' %}">
+                                    Watchlist <small><span class="badge shadow-sm text-bg-warning js-watchlist-badge" style="min-width: 1.8rem;">{{ user.watchlist_item_count }}</span></small>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item nav-item-responsive-margin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Log in to use feature">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 disabled" href="">Watchlist</a>
+                            </li>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <li class="nav-item nav-item-responsive-margin">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 {% if cue == 'create' %} text-decoration-underline {% endif %}" href="{% url 'listing-new' %}">Create Listing</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item nav-item-responsive-margin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Log in to use feature">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 disabled" href="">Create Listing</a>
+                            </li>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <li class="nav-item nav-item-responsive-margin">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 {% if cue == 'owned' %} text-decoration-underline {% endif %}" href="{% url 'listings-owned' %}">My Listings</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item nav-item-responsive-margin" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-animation="false" title="Log in to use feature">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary border border-1 disabled" href="">My Listings</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav section-login mt-3">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item nav-item-responsive-margin">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-secondary rounded-pill border border-1" href="{% url 'logout' %}">Log Out</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item nav-item-responsive-margin">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-primary rounded-pill border border-1" href="{% url 'login' %}?next={{ request.path }}">Log In</a>
+                            </li>
+                            <li class="nav-item nav-item-responsive-margin">
+                                <a class="mb-1 nav-link btn btn-light shadow-sm link-primary rounded-pill border border-1" href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    </div>
+    </header>
+
+    <main class="container-fluid wrapper-all">
+        {% if logout %}
+        <div class="alert alert-info d-flex align-items-center border-0 border-start border-5 border-info" role="alert">
+            <i class="bi flex-shrink-0 me-2 bi-check-circle"></i>
+            <div>Logged out successfully.</div>
+        </div>
+        {% endif %}
+
+        {% block body %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-light rounded-1 py-3 mt-5 border-top shadow border-4" style="height: 30vh;">
+    <div class="container-fluid wrapper-all">
+
+
+    </div>
+    </footer>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="{% static 'auctions/main.js' %}"></script>
+        {% block additional_js %}
+        {% endblock %}
+    </body>
+</html>
