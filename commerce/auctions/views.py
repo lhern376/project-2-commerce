@@ -31,6 +31,7 @@ PAGINATE_BY = 6
 ON_ENDS = 2
 ON_EACH_SIDE = 1
 
+
 ## Helper function for closing listings if they are expired but remain active
 # - Applies to following views:
 # edit, comment, get_min_bid, set_bid, listing-details, bid_history, active-listings, watchlist, my-listings
@@ -833,10 +834,11 @@ def login_view(request):
     else:
         # logic so that user is not sent back to /login or /register after login in
         next_val = request.GET.get("next", "")
+        context = {}
         if next_val:
-            if next_val == "/login" or next_val == "/register" or next_val == "/logout":
-                context = {}
-            else:
+            if not (
+                next_val == "/login" or next_val == "/register" or next_val == "/logout"
+            ):
                 context = {"next": next_val}
 
         return render(request, "auctions/login.html", context)
